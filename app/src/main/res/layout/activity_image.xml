@@ -32,8 +32,6 @@
         android:layout_margin="4dp"
         app:cardCornerRadius="16dp">
 
-        <include layout="@layout/toolbar"></include>
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -69,6 +67,7 @@
 
                 </RelativeLayout>
             </LinearLayout>
+
             <FrameLayout
                 android:id="@+id/content_view_items"
                 android:layout_width="match_parent"
@@ -79,13 +78,12 @@
                 android:padding="@dimen/fab_margin">
 
             </FrameLayout>
-
+            <include layout="@layout/toolbar"></include>
             <com.getbase.floatingactionbutton.FloatingActionsMenu
                 android:id="@+id/contentFloating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:visibility="visible"
                 app:fab_addButtonColorNormal="@color/colorAccent"

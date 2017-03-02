@@ -4,22 +4,24 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
-import android.transition.Explode;
-import android.transition.Slide;
-import android.view.Gravity;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Explode;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
@@ -90,7 +92,23 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the MenuApp; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        /*MenuItemCompat.OnActionExpandListener expandListener=new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                Toast.makeText(getApplicationContext(),"Si",Toast.LENGTH_LONG).show();
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                Toast.makeText(getApplicationContext(),"No",Toast.LENGTH_LONG).show();
+                return true;
+            }
+        };*/
+        MenuItem searchItem=menu.findItem(R.id.action_search);
+       //MenuItemCompat.setOnActionExpandListener(searchItem, expandListener);
+         SearchView searchView=(SearchView) MenuItemCompat.getActionView(searchItem);
+        return  super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -101,7 +119,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_search) {
             return true;
         }
 
@@ -138,7 +156,7 @@ public class MainActivity extends AppCompatActivity
         MenuApp item = (MenuApp) parent.getItemAtPosition(position);
 
         Intent intent = new Intent(this, ImageActivity.class);
-        intent.putExtra(DetailActivity.EXTRA_PARAM_ID, item.getId());
+        intent.putExtra(ImageActivity.EXTRA_PARAM_ID, item.getId());
 
         /*MenuApp.ITEMS=null;
         MenuApp.ITEMS=new MenuApp[1];
@@ -165,11 +183,16 @@ public class MainActivity extends AppCompatActivity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Slide t1 = new Slide();
             t1.setSlideEdge(Gravity.LEFT);
-            getWindow().setReenterTransition(t1);
+            //getWindow().setReenterTransition(t1);
             getWindow().setExitTransition(new Explode().setDuration(500));
         }
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
 
+
+    }
 }

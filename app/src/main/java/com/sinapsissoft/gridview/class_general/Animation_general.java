@@ -1,5 +1,6 @@
 package com.sinapsissoft.gridview.class_general;
 
+import android.content.Context;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
@@ -16,7 +17,7 @@ import com.sinapsissoft.gridview.*;
 public class Animation_general {
 
 
-    public Animation selectAnimation(int iSelected) {
+    public Animation selectAnimation(int iSelected, Context context) {
         int iAni=0;
         switch (iSelected) {
             case 0:
@@ -42,6 +43,6 @@ public class Animation_general {
                 break;
         }
 
-        return  AnimationUtils.loadAnimation(General.CONTEXT,iAni);
+        return  AnimationUtils.loadAnimation(context,iAni);
     }
 }

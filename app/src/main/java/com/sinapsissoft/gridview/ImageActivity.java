@@ -3,15 +3,13 @@ package com.sinapsissoft.gridview;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
-
-
-import android.app.FragmentManager;
+import android.content.res.Configuration;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,11 +17,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.widget.Toast;
-import android.widget.FrameLayout;
-
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.sinapsissoft.gridview.class_general.Animation_general;
+import com.sinapsissoft.gridview.class_general.General;
 import com.sinapsissoft.gridview.class_general.MenuFragment;
 
 
@@ -32,6 +29,7 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
     private static final boolean AUTO_HIDE = true;
     public static final String VIEW_NAME_HEADER_TEXT = "share_text";
     public static final String VIEW_NAME_HEADER_IMAGE = "share_image";
+    public static final String EXTRA_PARAM_ID = "com.sinapsissoft.gridview.extra.ID";
     private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
@@ -94,8 +92,10 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_image);
+        loadGeneral();
         loadToolbar();
         loadView();
+
         mVisible = true;
         //mControlsView = findViewById(R.id.contentFloating);
         mContentView = findViewById(R.id.fullscreen_content);
@@ -108,15 +108,54 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
             }
         });
         //findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+
+
+    }
+
+    private void loadGeneral() {
+
+        General.CONTEXT = this;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Checks the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // Toast.makeText(this, "landscape", Toast.LENGTH_SHORT).show();
+
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            //Toast.makeText(this, "portrait", Toast.LENGTH_SHORT).show();
+
+        }
+
+
     }
 
     private void loadView() {
+        animation_general = new Animation_general();
         content_view_items = findViewById(R.id.content_view_items);
     }
 
     private void loadToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarDetail);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Toast.makeText(getApplicationContext(),"Datos", Toast.LENGTH_SHORT).show();
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+                    finishAfterTransition();
+                } else {
+                    finish();
+                }
+
+            }
+        });
 
     }
 
@@ -156,7 +195,7 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
             //view.setVisibility(View.GONE);
             if (iItemsPreviuss == iItems) {
                 HideContent(view);
-            }else{
+            } else {
                 iItemsPreviuss = iItems;
             }
         } else {
@@ -172,11 +211,12 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
         view.clearAnimation();
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.anim.slide_up, R.anim.slide_left);
+        fragmentTransaction.setCustomAnimations(R.anim.slide_left, R.anim.slide_right);
         fragmentTransaction.replace(R.id.content_view_items, new MenuFragment().selectedFragment(iItems), "view items");
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        fragmentTransaction.addToBackStack(null);
+        //fragmentTransaction.addToBackStack();
         fragmentTransaction.commit();
+
 
     }
 
@@ -193,12 +233,13 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
-                    view.setVisibility(View.INVISIBLE);
+                    view.setVisibility(View.GONE);
 
                 }
             });
         } else {
-            view.startAnimation(animation_general.selectAnimation(1));
+            view.startAnimation(animation_general.selectAnimation(1, this));
+            view.setVisibility(View.GONE);
         }
 
     }
@@ -214,7 +255,9 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
             view.setVisibility(View.VISIBLE);
             anim.start();
         } else {
-            view.startAnimation(animation_general.selectAnimation(0));
+            view.setVisibility(View.VISIBLE);
+            view.startAnimation(animation_general.selectAnimation(0, this));
+
         }
 
     }
@@ -242,6 +285,8 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.hide();
+
+
         }
         //mControlsView.setVisibility(View.GONE);
         mVisible = false;
