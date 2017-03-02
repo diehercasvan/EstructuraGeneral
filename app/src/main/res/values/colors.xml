@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    //Color general
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    //Color general app
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="background_footer">#90000000</color>
+    <color name="colorPrimary_light">#C5CAE9</color>
+    <color name="colorBackgroundTrans">#8dece7e7</color>
+    <color name="colorBackgroundTrans2">#e5ded8d8</color>
+
+    //Color
+    <color name="black_overlay">#66000000</color>
+    <color name="icons">@color/white</color>
+    <color name="icons2">#7bff4081</color>
+    <color name="iconsSelect">#703f51b5</color>
+    //Color side nav bar
+    <color name="colorSideNavStart">@color/colorPrimaryDark</color>
+    <color name="colorSideNavCenter">@color/colorPrimary</color>
+    <color name="colorSideNavEnd">#9eabf4</color>
+</resources>
