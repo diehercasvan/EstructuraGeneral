@@ -1,8 +1,10 @@
 package com.sinapsissoft.gridview;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -10,12 +12,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.transition.Explode;
 import android.transition.Slide;
 import android.view.Gravity;
@@ -29,8 +31,19 @@ import com.sinapsissoft.gridview.adapters.ImageAdapter;
 import com.sinapsissoft.gridview.class_general.General;
 import com.sinapsissoft.gridview.dto.MenuApp;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemClickListener {
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemClickListener {
+
+    private GridView gridView = null;
+
+    private Toolbar toolbar;
+    private SearchView searchView;
+
+
+    private String[] sTitle = {"Jaguar F-Type 2015", "Mercedes AMG-GT", "Mazda MX-5", "Porsche 911 GTS", "BMW Serie 6", "Ford Mondeo", "Volvo V60 Cross Country", "Jaguar XE", "VW Golf R Variant", "Seat León ST Cupra"};
+    private int[] iIdImage = {R.mipmap.ic_launcher, R.mipmap.ic_launcher, R.mipmap.ic_launcher, R.mipmap.ic_launcher, R.mipmap.ic_launcher, R.mipmap.ic_launcher, R.mipmap.ic_launcher, R.mipmap.ic_launcher, R.mipmap.ic_launcher, R.mipmap.ic_launcher};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +52,9 @@ public class MainActivity extends AppCompatActivity
         if (savedInstanceState == null) {
             loadGeneral();
         }
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
+        loadToolbar();
+        loadDrawer();
+        loadNavigationView();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,31 +64,77 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
         loadVIew();
         setupWindowAnimations();
     }
+
+    private void loadToolbar() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+    }
+
+    private void loadDrawer() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+    }
+
+    private void loadNavigationView() {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
     private void loadGeneral() {
 
         General.CONTEXT = this;
     }
+
     private void loadVIew() {
-        GridView gridView = (GridView) findViewById(R.id.gridViewMenu);
-        gridView.setAdapter(new ImageAdapter(this));
-        /*gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(MainActivity.this, "" + position, Toast.LENGTH_SHORT).show();
-            }
-        });*/
+
+        loadGridMenu();
+    }
+
+    public void loadGridMenu() {
+
+        gridView = (GridView) findViewById(R.id.gridViewMenu);
+        searchView = (SearchView) findViewById(R.id.action_search);
+
+        final ImageAdapter imageAdapter = new ImageAdapter(this, this.getMenuApp());
+        gridView.setAdapter(imageAdapter);
         gridView.setOnItemClickListener(this);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                if(TextUtils.isEmpty(newText)){
+
+                    imageAdapter.getFilter().filter("");
+                    gridView.clearTextFilter();
+                }
+                else{
+
+                    imageAdapter.getFilter().filter(newText);
+                }
+                return false;
+            }
+        });
+    }
+
+    private ArrayList<MenuApp> getMenuApp() {
+        ArrayList<MenuApp> menuApp = new ArrayList<>();
+        MenuApp m;
+        for (int i = 0; i < sTitle.length; i++) {
+            m = new MenuApp(sTitle[i], iIdImage[i]);
+            menuApp.add(m);
+        }
+        return menuApp;
     }
 
     @Override
@@ -91,25 +150,19 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the MenuApp; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        /*MenuItemCompat.OnActionExpandListener expandListener=new MenuItemCompat.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                Toast.makeText(getApplicationContext(),"Si",Toast.LENGTH_LONG).show();
-                return true;
-            }
+        /*getMenuInflater().inflate(R.menu.main, menu);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchItem = menu.findItem(R.id.action_search);
+        searchView = (SearchView) searchItem.getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setSubmitButtonEnabled(true);
+        searchView.setOnQueryTextListener(this);
+*/
 
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                Toast.makeText(getApplicationContext(),"No",Toast.LENGTH_LONG).show();
-                return true;
-            }
-        };*/
-        MenuItem searchItem=menu.findItem(R.id.action_search);
-       //MenuItemCompat.setOnActionExpandListener(searchItem, expandListener);
-         SearchView searchView=(SearchView) MenuItemCompat.getActionView(searchItem);
-        return  super.onCreateOptionsMenu(menu);
+
+        return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -128,7 +181,7 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -179,6 +232,8 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
 
     }
+
+    @SuppressLint("RtlHardcoded")
     private void setupWindowAnimations() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Slide t1 = new Slide();

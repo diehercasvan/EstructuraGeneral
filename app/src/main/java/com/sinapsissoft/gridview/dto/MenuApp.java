@@ -2,6 +2,8 @@ package com.sinapsissoft.gridview.dto;
 
 import com.sinapsissoft.gridview.R;
 
+import java.util.ArrayList;
+
 /**
  * Created by DIEGO H CASALLAS  on 2/25/2017.
  */
@@ -27,7 +29,7 @@ public class MenuApp {
         return nombre.hashCode();
     }
 
-    public static MenuApp[] ITEMS = {
+    public static MenuApp[] ITEMS_LOAD = {
             new MenuApp("Jaguar F-Type 2015", R.mipmap.ic_launcher),
             new MenuApp("Mercedes AMG-GT", R.mipmap.ic_launcher),
             new MenuApp("Mazda MX-5", R.mipmap.ic_launcher),
@@ -39,6 +41,8 @@ public class MenuApp {
             new MenuApp("VW Golf R Variant", R.mipmap.ic_launcher),
             new MenuApp("Seat León ST Cupra", R.mipmap.ic_launcher),
     };
+    public static MenuApp[] ITEMS ;
+    public static ArrayList<MenuApp> LIST_ITEMS ;
 
     /**
      * Obtiene item basado en su identificador
